@@ -1,3 +1,4 @@
+using DotNetNinja.AutoBoundConfiguration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +19,10 @@ namespace DotNetNinja.ApiTemplate
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services
+                .AddAutoBoundConfigurations(Configuration).FromAssembly(typeof(Program).Assembly)
+                .Services
+                .AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
