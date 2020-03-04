@@ -24,6 +24,7 @@ namespace DotNetNinja.ApiTemplate
             var openApiSettings = services
                 .AddAutoBoundConfigurations(Configuration).FromAssembly(typeof(Program).Assembly).Provider.Get<OpenApiSettings>();
             services
+                .AddApplicationServices()
                 .AddControllers()
                 .Services
                 .AddUrlApiVersioning()

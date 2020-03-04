@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
+using ChaosMonkey.Guards;
 using DotNetNinja.ApiTemplate.Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +13,19 @@ namespace DotNetNinja.ApiTemplate.Controllers.v1
     [Route("api/v{version:apiVersion}/[controller]")]
     public class StatesController : ControllerBase
     {
+        public StatesController(IMapper mapper)
+        {
+            Mapper = Guard.IsNotNull(mapper, nameof(mapper));
+        }
+
+        protected IMapper Mapper { get; }
+
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(State.AllStates);
+            var model = Mapper.Map<List<StateModel>>(State.AllStates);
+
+            return Ok(model);
         }
 
         [HttpGet("{id}")]
@@ -21,11 +33,12 @@ namespace DotNetNinja.ApiTemplate.Controllers.v1
         {
             if (!string.IsNullOrWhiteSpace(id))
             {
-                var state = State.AllStates.SingleOrDefault(state =>
+                var data = State.AllStates.SingleOrDefault(state =>
                     state.Id.Equals(id, StringComparison.CurrentCultureIgnoreCase));
-                if (state != null)
+                if (data != null)
                 {
-                    return Ok(state);
+                    var model = Mapper.Map<StateModel>(data);
+                    return Ok(model);
                 }
 
                 return NotFound();
@@ -35,13 +48,14 @@ namespace DotNetNinja.ApiTemplate.Controllers.v1
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] State state)
+        public IActionResult Post([FromBody] StateModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
+            var state = Mapper.Map<State>(model);
             state.Id = state.Id.ToUpper();
             if (State.AllStates.Any(item => item.Id == state.Id))
             {
@@ -50,7 +64,8 @@ namespace DotNetNinja.ApiTemplate.Controllers.v1
 
             State.AllStates.Add(state);
 
-            return Created(new Uri($"/States/{state.Id}", UriKind.Relative), state);
+            model = Mapper.Map<StateModel>(state);
+            return Created(new Uri($"/States/{state.Id}", UriKind.Relative), model);
         }
 
         [HttpDelete("{id}")]
