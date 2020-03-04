@@ -1,9 +1,11 @@
+using DotNetNinja.ApiTemplate.App;
+using DotNetNinja.ApiTemplate.Configuration;
 using DotNetNinja.AutoBoundConfiguration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace DotNetNinja.ApiTemplate
 {
@@ -19,22 +21,22 @@ namespace DotNetNinja.ApiTemplate
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var openApiSettings = services
+                .AddAutoBoundConfigurations(Configuration).FromAssembly(typeof(Program).Assembly).Provider.Get<OpenApiSettings>();
             services
-                .AddAutoBoundConfigurations(Configuration).FromAssembly(typeof(Program).Assembly)
+                .AddControllers()
                 .Services
-                .AddControllers();
+                .AddUrlApiVersioning()
+                .AddOpenApi(openApiSettings);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider versionInfo, OpenApiSettings openApiSettings)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app
+                .UseDeveloperExceptionPageInDevelopment(env)
                 .UseHttpsRedirection()
+                .UseOpenApi(versionInfo, openApiSettings)
                 .UseRouting()
                 .UseAuthorization()
                 .UseEndpoints(endpoints => endpoints.MapControllers());

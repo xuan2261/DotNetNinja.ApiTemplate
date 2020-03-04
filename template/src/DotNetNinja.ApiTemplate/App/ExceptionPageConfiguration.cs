@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace DotNetNinja.ApiTemplate.App
 {
-    public static class IApplicationBuilderExtensions
+    public static class ExceptionPageConfiguration
     {
         public static IApplicationBuilder UseDeveloperExceptionPageInDevelopment(this IApplicationBuilder app,
             IWebHostEnvironment env, DeveloperExceptionPageOptions options = null)

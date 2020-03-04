@@ -3,10 +3,11 @@ using System.Linq;
 using DotNetNinja.ApiTemplate.Domain;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DotNetNinja.ApiTemplate.Controllers
+namespace DotNetNinja.ApiTemplate.Controllers.v1
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class StatesController : ControllerBase
     {
         [HttpGet]
